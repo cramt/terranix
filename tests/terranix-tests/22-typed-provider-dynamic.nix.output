@@ -1,0 +1,33 @@
+{
+  "resource": {
+    "hcloud_server": {
+      "web": {
+        "dynamic": {
+          "network": [
+            {
+              "content": {
+                "network_id": "${network.value}"
+              },
+              "for_each": "${var.networks}"
+            }
+          ]
+        },
+        "name": "web",
+        "server_type": "cx23"
+      }
+    }
+  },
+  "terraform": {
+    "required_providers": {
+      "hcloud": {
+        "source": "hetznercloud/hcloud",
+        "version": "1.69.0"
+      }
+    }
+  },
+  "variable": {
+    "networks": {
+      "type": "map(string)"
+    }
+  }
+}

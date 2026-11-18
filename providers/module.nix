@@ -97,6 +97,28 @@ let
     then mkOption { inherit type description; }
     else optionalOption type description;
 
+  # https://developer.hashicorp.com/terraform/language/expressions/dynamic-blocks
+  # `dynamic.<block type>`: one entry per dynamic block of that type, content typed
+  # like a literal block of it. For a nested block whose presence depends on a
+  # variable, which a literal list can't express.
+  dynamicOption = blockTypes:
+    optionalOption
+      (types.submodule {
+        options = mapAttrs
+          (_: nested: optionalOption
+            (types.coercedTo singleBlock singleton (types.listOf (types.submodule {
+              options = {
+                for_each = mkOption { type = valueType; };
+                iterator = optionalOption types.str "";
+                labels = optionalOption (types.listOf types.str) "";
+                content = mkOption { type = types.submodule { options = blockOptions nested.block; }; };
+              };
+            })))
+            "")
+          blockTypes;
+      })
+      "Nested blocks generated from a collection.";
+
   # https://developer.hashicorp.com/terraform/language/meta-arguments
   metaArgumentOptions = names: genAttrs names (_: optionalOption valueType "");
   resourceMetaArguments = [ "count" "for_each" "depends_on" "provider" "lifecycle" "provisioner" "connection" ];
@@ -113,6 +135,7 @@ let
     in
     {
       options = blockOptions block // metaArgumentOptions metaArguments // {
+        dynamic = dynamicOption (block.block_types or { });
         # replaces the unchecked one from `withReference` in ../core/terraform-options.nix
         __functor = mkOption {
           type = types.raw;

@@ -128,6 +128,18 @@
     outputFile = ./terranix-tests/21-typed-provider.nix.output;
   }
   {
+    text = "typed provider: dynamic blocks render, with content typed like the block";
+    file = ./terranix-tests/22-typed-provider-dynamic.nix;
+    outputFile = ./terranix-tests/22-typed-provider-dynamic.nix.output;
+  }
+  {
+    text = "typed provider: an unknown argument in a dynamic block's content fails at eval";
+    file = ./terranix-tests/22-typed-provider-dynamic-fail-arg.nix;
+    success = false;
+    outputFile = ./terranix-tests/22-typed-provider-dynamic-fail-arg.nix.output;
+    partialMatchOutput = true;
+  }
+  {
     text = "typed provider: an unknown argument fails at eval";
     file = ./terranix-tests/21-typed-provider-fail-arg.nix;
     success = false;
